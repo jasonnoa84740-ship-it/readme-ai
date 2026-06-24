@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReadmeAI — Generate perfect READMEs instantly</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #7c6af7;
+    --accent-dim: #3d3478;
+    --green: #3dffa0;
+    --text: #e8e8f0;
+    --muted: #6b6b88;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 40px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--accent); }
+
+  .nav-badge {
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--accent-dim);
+  }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 80px 20px 50px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--green);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -1.5px;
+    margin-bottom: 18px;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.6;
+    max-width: 520px;
+    margin: 0 auto 12px;
+  }
+
+  .free-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(61,255,160,0.08);
+    border: 1px solid rgba(61,255,160,0.2);
+    color: var(--green);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-top: 8px;
+  }
+
+  /* MAIN APP */
+  .app {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+    width: 100%;
+    flex: 1;
+  }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 13px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tab.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  /* INPUT AREA */
+  .input-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .input-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+
+  .input-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 6px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 200px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 18px;
+    resize: vertical;
+  }
+
+  textarea::placeholder { color: var(--muted); }
+
+  /* OPTIONS */
+  .options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .option-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .option-card:hover { border-color: var(--accent-dim); }
+  .option-card.selected { border-color: var(--accent); background: rgba(124,106,247,0.08); }
+
+  .option-card input { display: none; }
+
+  .option-icon { font-size: 18px; }
+
+  .option-text {
+    font-size: 13px;
+    font-family: var(--mono);
+    color: var(--text);
+  }
+
+  .option-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* GENERATE BUTTON */
+  .generate-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .generate-btn:hover { background: #6a58e5; transform: translateY(-1px); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* LOADING */
+  .loading-bar {
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 24px;
+    overflow: hidden;
+    display: none;
+  }
+
+  .loading-bar.active { display: block; }
+
+  .loading-progress {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    border-radius: 2px;
+    animation: progress 2s ease infinite;
+  }
+
+  @keyframes progress {
+    0% { width: 0%; margin-left: 0; }
+    50% { width: 60%; margin-left: 20%; }
+    100% { width: 0%; margin-left: 100%; }
+  }
+
+  /* OUTPUT */
+  .output-section {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .output-section.visible { display: block; }
+
+  .output-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .output-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--green);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .output-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-sm {
+    padding: 7px 14px;
+    border-radius: 7px;
+    font-family: var(--mono);
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    transition: all 0.15s;
+  }
+
+  .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-sm.primary { background: var(--accent); border-color: var(--accent); color: white; }
+  .btn-sm.primary:hover { background: #6a58e5; }
+
+  .output-content {
+    padding: 20px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 200px;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  /* PREVIEW */
+  .preview-content {
+    padding: 20px;
+    display: none;
+    min-height: 200px;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  .preview-content.visible { display: block; }
+  .output-content.hidden { display: none; }
+
+  /* Markdown preview styles */
+  .preview-content h1 { font-size: 22px; margin-bottom: 12px; color: var(--text); }
+  .preview-content h2 { font-size: 17px; margin: 20px 0 8px; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .preview-content h3 { font-size: 14px; margin: 14px 0 6px; color: var(--accent); }
+  .preview-content p { color: #bbb; margin-bottom: 10px; font-size: 14px; line-height: 1.7; }
+  .preview-content code { background: var(--border); padding: 2px 6px; border-radius: 4px; font-family: var(--mono); font-size: 12px; color: var(--green); }
+  .preview-content pre { background: #0d0d14; border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin: 12px 0; overflow-x: auto; }
+  .preview-content pre code { background: none; padding: 0; }
+  .preview-content ul, .preview-content ol { margin: 8px 0 12px 20px; color: #bbb; font-size: 14px; }
+  .preview-content li { margin-bottom: 4px; }
+  .preview-content a { color: var(--accent); text-decoration: none; }
+  .preview-content strong { color: var(--text); }
+  .preview-content blockquote { border-left: 3px solid var(--accent); padding-left: 14px; color: var(--muted); margin: 12px 0; }
+  .preview-content img { max-width: 100%; border-radius: 6px; }
+  .preview-content table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  .preview-content th { background: var(--border); padding: 8px 12px; text-align: left; color: var(--text); }
+  .preview-content td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: #bbb; }
+
+  /* STATS */
+  .stats {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 50px 0 30px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .pulse { animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">readme<span>AI</span></div>
+  <div class="nav-badge">✦ Free MVP</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">✦ Powered by Claude AI</div>
+  <h1>Generate a <em>perfect README</em><br>in 10 seconds</h1>
+  <p>Paste your code or describe your project. Get a professional, complete README ready for GitHub.</p>
+  <div class="free-badge">⚡ Free to use — no account needed</div>
+</div>
+
+<div class="app">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('code')">📋 Paste code</button>
+    <button class="tab" onclick="switchTab('describe')">✏️ Describe project</button>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-section">
+    <div class="input-header">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <span class="input-label" id="input-label">// paste your code here</span>
+    </div>
+    <textarea id="main-input" placeholder="// Paste your main file, package.json, or any code...&#10;&#10;// Example:&#10;const express = require('express')&#10;const app = express()&#10;app.get('/', (req, res) => res.send('Hello World'))&#10;app.listen(3000)"></textarea>
+  </div>
+
+  <!-- OPTIONS -->
+  <div class="options">
+    <label class="option-card selected" onclick="selectOption(this)">
+      <input type="radio" name="style" value="professional" checked>
+      <span class="option-icon">💼</span>
+      <div>
+        <div class="option-text">Professional</div>
+        <div class="option-sub">Clean & complete</div>
+      </div>
+    </label>
+    <label class="option-card" onclick="selectOption(this)">
+      <input type="radio" name="style" value="minimal">
+      <span class="option-icon">⚡</span>
+      <div>
+        <div class="option-text">Minimal</div>
+        <div class="option-sub">Short & direct</div>
+      </div>
+    </label>
+    <label class="option-card" onclick="selectOption(this)">
+      <input type="radio" name="style" value="badges">
+      <span class="option-icon">🏅</span>
+      <div>
+        <div class="option-text">With badges</div>
+        <div class="option-sub">Shields.io style</div>
+      </div>
+    </label>
+    <label class="option-card" onclick="selectOption(this)">
+      <input type="radio" name="style" value="emoji">
+      <span class="option-icon">🚀</span>
+      <div>
+        <div class="option-text">Fun & emoji</div>
+        <div class="option-sub">Casual projects</div>
+      </div>
+    </label>
+  </div>
+
+  <!-- GENERATE -->
+  <button class="generate-btn" id="gen-btn" onclick="generate()">
+    <span id="btn-icon">⚡</span>
+    <span id="btn-text">Generate README</span>
+  </button>
+
+  <!-- LOADING -->
+  <div class="loading-bar" id="loading-bar">
+    <div class="loading-progress"></div>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="output-section" id="output-section">
+    <div class="output-header">
+      <div class="output-title">
+        <span class="pulse">●</span> README.md generated
+      </div>
+      <div class="output-actions">
+        <button class="btn-sm" id="toggle-view-btn" onclick="toggleView()">👁 Preview</button>
+        <button class="btn-sm primary" onclick="copyReadme()">📋 Copy</button>
+        <button class="btn-sm" onclick="downloadReadme()">⬇ Download</button>
+      </div>
+    </div>
+    <div class="output-content" id="output-content"></div>
+    <div class="preview-content" id="preview-content"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">10s</div>
+      <div class="stat-label">avg generation time</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">AI-powered</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0€</div>
+      <div class="stat-label">to get started</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let currentTab = 'code';
+  let showingPreview = false;
+  let currentReadme = '';
+
+  function switchTab(tab) {
+    currentTab = tab;
+    const tabs = document.querySelectorAll('.tab');
+    tabs[0].classList.toggle('active', tab === 'code');
+    tabs[1].classList.toggle('active', tab === 'describe');
+
+    const textarea = document.getElementById('main-input');
+    const label = document.getElementById('input-label');
+
+    if (tab === 'code') {
+      textarea.placeholder = "// Paste your main file, package.json, or any code...\n\n// Example:\nconst express = require('express')\nconst app = express()\napp.get('/', (req, res) => res.send('Hello World'))\napp.listen(3000)";
+      label.textContent = '// paste your code here';
+    } else {
+      textarea.placeholder = "Describe your project in plain text...\n\nExample:\nA React app that lets users track their daily water intake. It has a dashboard, reminders, and connects to a Node.js backend with MongoDB.";
+      label.textContent = '// describe your project';
+    }
+  }
+
+  function selectOption(card) {
+    document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    card.querySelector('input').checked = true;
+  }
+
+  function getStyle() {
+    return document.querySelector('input[name="style"]:checked')?.value || 'professional';
+  }
+
+  async function generate() {
+    const input = document.getElementById('main-input').value.trim();
+    if (!input) {
+      alert('Please paste your code or describe your project first!');
+      return;
+    }
+
+    const btn = document.getElementById('gen-btn');
+    const btnText = document.getElementById('btn-text');
+    const btnIcon = document.getElementById('btn-icon');
+    const loadingBar = document.getElementById('loading-bar');
+    const outputSection = document.getElementById('output-section');
+    const outputContent = document.getElementById('output-content');
+
+    btn.disabled = true;
+    btnText.textContent = 'Generating...';
+    btnIcon.textContent = '⏳';
+    loadingBar.classList.add('active');
+    outputSection.classList.remove('visible');
+
+    const style = getStyle();
+    const isCode = currentTab === 'code';
+
+    const styleInstructions = {
+      professional: 'Write a clean, professional README with all standard sections: title, description, features, installation, usage, API docs if relevant, contributing, license.',
+      minimal: 'Write a minimal README with only essential sections: title, short description, installation, and usage. Keep it concise.',
+      badges: 'Write a professional README and include shield.io badges at the top for build status, version, license, etc. Use placeholder URLs like https://img.shields.io/badge/...',
+      emoji: 'Write a fun README using emojis throughout. Make it energetic and friendly while keeping all technical information accurate.'
+    };
+
+    const prompt = isCode
+      ? `You are an expert developer. Analyze this code and generate a complete, accurate README.md file in Markdown format.\n\nCode:\n\`\`\`\n${input}\n\`\`\`\n\n${styleInstructions[style]}\n\nOnly output the raw Markdown, no explanation.`
+      : `You are an expert developer. Generate a complete, accurate README.md file in Markdown format for this project.\n\nProject description:\n${input}\n\n${styleInstructions[style]}\n\nOnly output the raw Markdown, no explanation.`;
+
+    try {
+      const response = await fetch('/.netlify/functions/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+
+      const data = await response.json();
+      const readme = data.readme || '';
+
+      currentReadme = readme;
+      outputContent.textContent = readme;
+      outputSection.classList.add('visible');
+
+      // reset to raw view
+      showingPreview = false;
+      outputContent.classList.remove('hidden');
+      document.getElementById('preview-content').classList.remove('visible');
+      document.getElementById('toggle-view-btn').textContent = '👁 Preview';
+
+    } catch (err) {
+      outputContent.textContent = '// Error generating README. Please try again.';
+      outputSection.classList.add('visible');
+    }
+
+    btn.disabled = false;
+    btnText.textContent = 'Generate README';
+    btnIcon.textContent = '⚡';
+    loadingBar.classList.remove('active');
+  }
+
+  function toggleView() {
+    showingPreview = !showingPreview;
+    const raw = document.getElementById('output-content');
+    const preview = document.getElementById('preview-content');
+    const btn = document.getElementById('toggle-view-btn');
+
+    if (showingPreview) {
+      preview.innerHTML = markdownToHtml(currentReadme);
+      preview.classList.add('visible');
+      raw.classList.add('hidden');
+      btn.textContent = '< Raw';
+    } else {
+      preview.classList.remove('visible');
+      raw.classList.remove('hidden');
+      btn.textContent = '👁 Preview';
+    }
+  }
+
+  function markdownToHtml(md) {
+    return md
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/```[\w]*\n([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2">')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+      .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+      .replace(/^- (.+)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+      .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/^(?!<[h|u|p|b|l|i|c|a])/gm, '<p>')
+      .replace(/(?<![>])$/gm, '</p>');
+  }
+
+  function copyReadme() {
+    navigator.clipboard.writeText(currentReadme).then(() => {
+      const btn = event.target;
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy', 2000);
+    });
+  }
+
+  function downloadReadme() {
+    const blob = new Blob([currentReadme], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'README.md';
+    a.click();
+  }
+</script>
+</body>
+</html>
